@@ -19,7 +19,7 @@ type ConfigStore = {
   setStyle: (style: Style) => void
 
   size: Size
-  setSize: (style: Size) => void
+  setSize: (size: Size) => void
 
   reset: () => void
 }
