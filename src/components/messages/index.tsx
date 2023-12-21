@@ -3,7 +3,7 @@ import { PhotoProvider, PhotoView } from 'react-photo-view'
 import { Message, useChatStore } from 'src/stores/chat'
 import 'react-photo-view/dist/react-photo-view.css'
 import OpenAIIcon from '../../assets/icons/openai-logomark.svg'
-import { User2, Loader, AlertCircle } from 'lucide-react'
+import { User2, Loader, AlertCircle, Download } from 'lucide-react'
 import { imageStore } from 'src/lib/image-persist'
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert'
 
@@ -50,6 +50,15 @@ const ChatItem = ({ type, content, isLoading, isError, imageMeta, timestamp }: M
     })()
   }, [content])
 
+  const download = (src: string) => {
+    const link = document.createElement('a')
+    link.href = src
+    link.download = 'image.png' // or any other filename you want
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   return (
     <div className="border-b border-gray-200 p-4 odd:bg-gray-50 last-of-type:border-none">
       <div className="mb-4 flex items-center gap-2">
@@ -86,9 +95,17 @@ const ChatItem = ({ type, content, isLoading, isError, imageMeta, timestamp }: M
           ) : (
             <div className="flex flex-wrap gap-2">
               {srcs?.map((src) => (
-                <PhotoView src={src} key={src}>
-                  <img src={src} className="w-[200px] cursor-pointer md:w-[300px]"></img>
-                </PhotoView>
+                <div className="group relative overflow-hidden rounded" key={src}>
+                  <PhotoView src={src} key={src}>
+                    <img src={src} className="w-[200px] cursor-pointer md:w-[300px]"></img>
+                  </PhotoView>
+                  <div
+                    onClick={() => download(src)}
+                    className="absolute right-2 top-2 cursor-pointer rounded bg-black bg-opacity-50 p-2 text-white opacity-0 transition duration-200 group-hover:opacity-100"
+                  >
+                    <Download size={24} className="text-white" />
+                  </div>
+                </div>
               ))}
             </div>
           )}
