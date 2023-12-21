@@ -1,3 +1,10 @@
+> **This is a fork of [dalle3-playground](https://github.com/Quilljou/dalle3-playground) with added 'Image count' property.**
+>
+> **Beware! Dalle3 API is not cheap, and you can easily rack up high charges if you use this hafazardly.**
+>
+> ⚠️ **Use at your own risk!** ⚠️
+
+
 # DALL·E 3 Playground
 
 DALL·E 3 Playground (Unofficial) is used to play with OpenAI Image generation API - [DALL·E 3](https://openai.com/dall-e-3), You must use your own [OpenAI API Key](https://platform.openai.com/account/api-keys)
