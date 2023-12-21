@@ -1,15 +1,19 @@
+import { HelpCircle } from 'lucide-react'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'src/components/ui/select'
-import { Quality, Size, Style, useConfigStore } from 'src/stores/config'
+import { Count, Quality, Size, Style, useConfigStore } from 'src/stores/config'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
-import { HelpCircle } from 'lucide-react'
 
+const MAX_IMAGE_COUNT = 8
+
+const counts: Count[] = new Array(MAX_IMAGE_COUNT).fill(0).map((_, i) => `${i + 1}` as Count)
 const sizes: Size[] = ['1024x1024', '1792x1024', '1024x1792']
 const qualities: Quality[] = ['standard', 'hd']
 const styles: Style[] = ['vivid', 'natural']
 
 export const SettingForm = () => {
-  const { quality, setQuality, size, setSize, style, setStyle, apiKey, setAPIKey, reset } = useConfigStore()
+  const { count, setCount, quality, setQuality, size, setSize, style, setStyle, apiKey, setAPIKey, reset } =
+    useConfigStore()
 
   return (
     <div className="flex w-full flex-col space-y-4">
@@ -21,6 +25,24 @@ export const SettingForm = () => {
           </a>
         </Button>
       </div>
+      <div>
+        <label className="block py-2">Image Count</label>
+        <Select value={count} onValueChange={(value) => setCount(value as Count)}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Image Count" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {counts.map((item) => (
+                <SelectItem value={item} key={item}>
+                  {item?.toUpperCase()}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
       <div>
         <label className="block py-2">Quality</label>
         <Select value={quality} onValueChange={(value) => setQuality(value as Quality)}>

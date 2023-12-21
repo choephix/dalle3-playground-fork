@@ -69,7 +69,8 @@ export const useChatStore = create(
         set(() => ({ inputPrompt }))
       },
       async addMessage() {
-        const { style, size, apiKey, quality } = useConfigStore.getState()
+        const { count, style, size, apiKey, quality } = useConfigStore.getState()
+
         if (!apiKey) {
           get().toggleApiKeyDialog(true)
           return
@@ -97,12 +98,7 @@ export const useChatStore = create(
         controller = new AbortController()
         const signal = controller.signal
         try {
-          const keys = await Promise.all([
-            generateImage(options, signal),
-            generateImage(options, signal),
-            generateImage(options, signal),
-            generateImage(options, signal),
-          ])
+          const keys = await Promise.all(Array.from({ length: Number(count) }, () => generateImage(options, signal)))
           const imageMeta: ImageMeta = {
             style: useConfigStore.getState().style,
             size: useConfigStore.getState().size,
