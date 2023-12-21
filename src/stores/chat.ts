@@ -36,6 +36,18 @@ type ChatStore = {
 
 let controller: AbortController
 
+async function generateImage(options: ImageGenerateParams, signal: AbortSignal) {
+  const openai = new OpenAI({
+    apiKey: useConfigStore.getState().apiKey,
+    dangerouslyAllowBrowser: true,
+  })
+  const completion = await openai.images.generate(options, { signal: signal })
+  const base64 = completion.data[0].b64_json
+  if (!base64) throw new Error('invalid base64')
+  const key = await imageStore.storeImage('data:image/png;base64,' + base64)
+  return key
+}
+
 export const useChatStore = create(
   persist<ChatStore>(
     (set, get) => ({
@@ -89,12 +101,12 @@ export const useChatStore = create(
         controller = new AbortController()
         const signal = controller.signal
         try {
-          const completion = await openai.images.generate(options, {
-            signal: signal,
-          })
-          const base64 = completion.data[0].b64_json
-          if (!base64) throw new Error('invalid base64')
-          const key = await imageStore.storeImage('data:image/png;base64,' + base64)
+          const keys = await Promise.all([
+            generateImage(options, signal),
+            generateImage(options, signal),
+            generateImage(options, signal),
+            generateImage(options, signal),
+          ])
           const imageMeta: ImageMeta = {
             style: useConfigStore.getState().style,
             size: useConfigStore.getState().size,
@@ -104,13 +116,13 @@ export const useChatStore = create(
             inputPrompt: '',
             messages: [
               ...get().messages.slice(0, -1),
-              {
-                type: 'assistant',
+              ...keys.map((key) => ({
+                type: 'assistant' as const,
                 content: key,
                 imageMeta,
                 isError: false,
                 timestamp: Date.now(),
-              },
+              })),
             ],
           }))
         } catch (error: any) {
