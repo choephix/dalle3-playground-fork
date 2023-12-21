@@ -116,13 +116,13 @@ export const useChatStore = create(
             inputPrompt: '',
             messages: [
               ...get().messages.slice(0, -1),
-              ...keys.map((key) => ({
-                type: 'assistant' as const,
-                content: key,
+              {
+                type: 'assistant',
+                content: keys.join('|'),
                 imageMeta,
                 isError: false,
                 timestamp: Date.now(),
-              })),
+              },
             ],
           }))
         } catch (error: any) {

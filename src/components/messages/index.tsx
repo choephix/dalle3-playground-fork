@@ -39,11 +39,14 @@ export const MessageList: React.FC = () => {
 }
 
 const ChatItem = ({ type, content, isLoading, isError, imageMeta, timestamp }: Message) => {
-  const [src, setSrc] = useState('')
+  const [srcs, setSrcs] = useState(null as null | string[])
   useEffect(() => {
     ;(async () => {
-      const image = await imageStore.retrieveImage(content)
-      setSrc(image || '')
+      const keys = content.split('|')
+      const images = await Promise.all(
+        keys.map((key) => imageStore.retrieveImage(key)).filter(Boolean) as Promise<string>[],
+      )
+      setSrcs(images.length ? images : null)
     })()
   }, [content])
 
@@ -81,13 +84,13 @@ const ChatItem = ({ type, content, isLoading, isError, imageMeta, timestamp }: M
               <AlertDescription>{content}</AlertDescription>
             </Alert>
           ) : (
-            <>
-              {src && (
-                <PhotoView src={src}>
+            <div className="flex flex-wrap gap-2">
+              {srcs?.map((src) => (
+                <PhotoView src={src} key={src}>
                   <img src={src} className="w-[200px] cursor-pointer md:w-[300px]"></img>
                 </PhotoView>
-              )}
-            </>
+              ))}
+            </div>
           )}
         </>
       )}
