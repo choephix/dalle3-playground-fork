@@ -85,10 +85,6 @@ export const useChatStore = create(
             { type: 'assistant', content: '', isError: false, isLoading: true, timestamp: Date.now() },
           ],
         }))
-        const openai = new OpenAI({
-          apiKey: apiKey,
-          dangerouslyAllowBrowser: true,
-        })
         const options: ImageGenerateParams = {
           prompt: get().inputPrompt,
           model: 'dall-e-3',
