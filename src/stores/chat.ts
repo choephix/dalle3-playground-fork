@@ -34,6 +34,9 @@ type ChatStore = {
   cancelGeneration: () => any
 }
 
+const ERROR_IMG =
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/OOjs_UI_icon_error-destructive.svg/1200px-OOjs_UI_icon_error-destructive.svg.png'
+
 let controller: AbortController
 
 async function generateImage(options: ImageGenerateParams, signal: AbortSignal) {
@@ -98,7 +101,9 @@ export const useChatStore = create(
         controller = new AbortController()
         const signal = controller.signal
         try {
-          const keys = await Promise.all(Array.from({ length: Number(count) }, () => generateImage(options, signal)))
+          const keys = await Promise.all(
+            Array.from({ length: Number(count) }, () => generateImage(options, signal).catch(() => ERROR_IMG)),
+          )
           const imageMeta: ImageMeta = {
             style: useConfigStore.getState().style,
             size: useConfigStore.getState().size,
