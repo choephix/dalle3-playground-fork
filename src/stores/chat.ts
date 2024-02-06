@@ -112,7 +112,6 @@ export const useChatStore = create(
             quality: useConfigStore.getState().quality,
           }
           set(() => ({
-            inputPrompt: '',
             messages: [
               ...get().messages.slice(0, -1),
               {
