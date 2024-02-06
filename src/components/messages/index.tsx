@@ -39,12 +39,14 @@ export const MessageList: React.FC = () => {
 }
 
 const ChatItem = ({ type, content, isLoading, isError, imageMeta, timestamp }: Message) => {
-  const [srcs, setSrcs] = useState(null as null | string[])
+  const [srcs, setSrcs] = useState(null as null | (string | Error)[])
   useEffect(() => {
     ;(async () => {
       const keys = content.split('|')
       const images = await Promise.all(
-        keys.map((key) => imageStore.retrieveImage(key)).filter(Boolean) as Promise<string>[],
+        keys
+          .map((key) => (key.startsWith('error:') ? new Error(key.slice(6)) : imageStore.retrieveImage(key)))
+          .filter(Boolean) as Promise<string>[],
       )
       setSrcs(images.length ? images : null)
     })()
@@ -94,17 +96,25 @@ const ChatItem = ({ type, content, isLoading, isError, imageMeta, timestamp }: M
             </Alert>
           ) : (
             <div className="flex flex-wrap gap-2">
-              {srcs?.map((src) => (
-                <div className="group relative overflow-hidden rounded" key={src}>
-                  <PhotoView src={src} key={src}>
-                    <img src={src} className="w-[200px] cursor-pointer md:w-[300px]"></img>
-                  </PhotoView>
-                  <div
-                    onClick={() => download(src)}
-                    className="absolute right-2 top-2 cursor-pointer rounded bg-black bg-opacity-50 p-2 text-white opacity-0 transition duration-200 group-hover:opacity-100"
-                  >
-                    <Download size={24} className="text-white" />
-                  </div>
+              {srcs?.map((src, index) => (
+                <div className="group relative overflow-hidden rounded" key={index}>
+                  {src instanceof Error ? (
+                    <h3 className="h-full flex w-[200px] cursor-pointer items-center justify-center border border-red-700 bg-gray-100 text-center font-bold text-red-700 md:w-[300px]">
+                      {src.message}
+                    </h3>
+                  ) : (
+                    <>
+                      <PhotoView src={src} key={src}>
+                        <img src={src} className="w-[200px] cursor-pointer md:w-[300px]"></img>
+                      </PhotoView>
+                      <div
+                        onClick={() => download(src)}
+                        className="absolute right-2 top-2 cursor-pointer rounded bg-black bg-opacity-50 p-2 text-white opacity-0 transition duration-200 group-hover:opacity-100"
+                      >
+                        <Download size={24} className="text-white" />
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>

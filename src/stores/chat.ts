@@ -102,7 +102,9 @@ export const useChatStore = create(
         const signal = controller.signal
         try {
           const keys = await Promise.all(
-            Array.from({ length: Number(count) }, () => generateImage(options, signal).catch(() => ERROR_IMG)),
+            Array.from({ length: Number(count) }, () =>
+              generateImage(options, signal).catch((error) => `error:${error}`),
+            ),
           )
           const imageMeta: ImageMeta = {
             style: useConfigStore.getState().style,
